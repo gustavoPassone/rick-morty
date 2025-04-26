@@ -1,31 +1,96 @@
-/* let fetchAPI = fetch("https://rickandmortyapi.com/api/character")
+let urlBase = "https://rickandmortyapi.com/api/character";
+let url = urlBase;
+let carregando = false;
 
-.then((res) => res.json())
-.then((data) => {
-    displayPersonagens(data)
-})
+async function carregarPersonagens(reset = false) {
+    if (carregando || !url) return;
 
-function displayPersonagens(data) {
-    let divCards = document.querySelector(".cards")
+    carregando = true;
 
-    data.results.map((personagem) => {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (reset) {
+        document.querySelector(".cards").innerHTML = ""; // Limpa os cards se for nova pesquisa
+    }
+
+    displayPersonagens(data.results);
+    url = data.info.next; // próxima página
+
+    carregando = false;
+}
+
+function displayPersonagens(personagens) {
+    let divCards = document.querySelector(".cards");
+
+    personagens.map((personagem) => {
+        let statusClass = '';
+        if (personagem.status === 'Alive') {
+            statusClass = 'alive-color';
+        } else if (personagem.status === 'Dead') {
+            statusClass = 'dead-color';
+        } else {
+            statusClass = 'unknown-color';
+        }
+
         divCards.innerHTML += `
             <div class="card">
-                    <div class="personagem">
-                        <img src="${personagem.image}" alt="">
-                        <h2>${personagem.name}</h2>
+                <div class="image-container">
+                    <img src="${personagem.image}" alt="${personagem.name}">
+                </div>
+                <div class="content">
+                    <h2>${personagem.name}</h2>
+                    <div class="status-specie">
+                        <div class="status-color ${statusClass}"></div>
+                        <p>${personagem.status}</p>
+                        <span>-</span>
+                        <p>${personagem.species}</p>
                     </div>
-                    <div class="content">
-                        <p><span>Status:</span>${personagem.status}</p>
-                        <p><span>Gender:</span>${personagem.gender}</p>
-                        <p><span>Species:</span>${personagem.species}</p>
-                        <p><span>Origin:</span>${personagem.origin.name}</p>
+                    <div class="origin">
+                        <p>Origin</p>
+                        <p>${personagem.origin.name}</p>
+                    </div>
+                    <div class="gender">
+                        <p>Gender</p>
+                        <p>${personagem.gender}</p>
                     </div>
                 </div>
-        `
-    })
-} */
+            </div>
+        `;
+    });
+}
 
-let color = document.getElementById("status-color")
+// Observador para scroll infinito
+const sentinel = document.createElement('div');
+sentinel.id = 'sentinel';
+document.body.appendChild(sentinel);
 
-color.classList.add("dead-color")
+const observer = new IntersectionObserver((entries) => {
+    if (entries.some(entry => entry.isIntersecting)) {
+        carregarPersonagens();
+    }
+});
+
+observer.observe(document.querySelector('#sentinel'));
+
+// Botão de pesquisar
+document.getElementById('btn-pesquisar').addEventListener('click', () => {
+    const termo = document.getElementById('input-pesquisa').value.trim();
+    
+    if (termo) {
+        url = `${urlBase}?name=${encodeURIComponent(termo)}`;
+    } else {
+        url = urlBase;
+    }
+
+    carregarPersonagens(true); // true para resetar os cards
+});
+
+document.getElementById('input-pesquisa').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        document.getElementById('btn-pesquisar').click();
+    }
+});
+
+// Primeiro carregamento
+carregarPersonagens();
