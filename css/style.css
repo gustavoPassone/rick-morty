@@ -85,7 +85,6 @@ section {
         justify-content: center;
         flex-wrap: wrap;
         gap: 20px;
-        padding-bottom: 100px;
         
         & .card {
             max-width: 500px;
@@ -98,6 +97,13 @@ section {
             box-shadow: 10px 10px 10px #0000002c;
             background-color: #373737;
             overflow: hidden;
+            cursor: pointer;
+            transition: .3s;
+
+            &:hover {
+                transform: scale(1.02);
+                box-shadow: 10px 10px 10px #0000008e;
+            }
 
             & .image-container {
                 /* flex: 0 0 40%; */
@@ -159,6 +165,8 @@ section {
                 }
             }
         }
+
+        
     }
 }
 

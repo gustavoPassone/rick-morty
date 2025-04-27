@@ -17,6 +17,13 @@ async function carregarPersonagens(reset = false) {
     displayPersonagens(data.results);
     url = data.info.next; // próxima página
 
+    const btnMais = document.querySelector("#btn-mais")
+    if (!url) {
+        btnMais.style.display = 'none'
+    } else {
+        btnMais.style.display = 'block'
+    }
+
     carregando = false;
 }
 
@@ -34,7 +41,7 @@ function displayPersonagens(personagens) {
         }
 
         divCards.innerHTML += `
-            <div class="card">
+            <div class="card" data-link="./pages/detalhes.html?id=${personagem.id}">
                 <div class="image-container">
                     <img src="${personagem.image}" alt="${personagem.name}">
                 </div>
@@ -58,22 +65,22 @@ function displayPersonagens(personagens) {
             </div>
         `;
     });
+
+    // clique cards
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function() {
+            const link = card.getAttribute('data-link');
+            window.location.href = link;
+        });
+    });
 }
 
-// Observador para scroll infinito
-const sentinel = document.createElement('div');
-sentinel.id = 'sentinel';
-document.body.appendChild(sentinel);
-
-const observer = new IntersectionObserver((entries) => {
-    if (entries.some(entry => entry.isIntersecting)) {
-        carregarPersonagens();
-    }
+//carregar outro pagina com o botão
+document.getElementById('btn-mais').addEventListener('click', () => {
+    carregarPersonagens();
 });
 
-observer.observe(document.querySelector('#sentinel'));
-
-// Botão de pesquisar
+//pesquisar
 document.getElementById('btn-pesquisar').addEventListener('click', () => {
     const termo = document.getElementById('input-pesquisa').value.trim();
     
@@ -92,5 +99,4 @@ document.getElementById('input-pesquisa').addEventListener('keypress', (e) => {
     }
 });
 
-// Primeiro carregamento
 carregarPersonagens();
