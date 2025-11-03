@@ -22,6 +22,11 @@ Com ele, é possível:
 
 ---
 
+## Prévia
+<img width="1285" height="621" alt="image" src="https://github.com/user-attachments/assets/e09f6348-91c8-4cae-af6e-083d016a22f3" />
+
+---
+
 ## 🚀 Funcionalidades
 
 - ✅ Listagem de todos os personagens com paginação
